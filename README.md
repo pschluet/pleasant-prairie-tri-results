@@ -1,8 +1,24 @@
-# Pleasant Prairie Triathlon 2026 — Results Scraper
+# Pleasant Prairie Triathlon 2026 — Results
 
-Scrapes the Olympic Individual Overall results from the 2026 Pleasant Prairie Triathlon into a local JSON file.
+Results explorer and data scraper for the 2026 Pleasant Prairie Olympic Triathlon.
 
-## Usage
+## Results Explorer
+
+Open `index.html` in a browser (no server needed — double-click to open from `file://`).
+
+Requires an internet connection to load the D3 charting library from CDN.
+
+**Features:**
+- Kernel density estimate (KDE) distributions for all 6 race segments: Swim, T1, Bike, T2, Run, and Overall. Each plot shows a faint full-field curve and a bold filtered-subset curve for comparison.
+- Filter by gender, age range, primary division, and secondary division.
+- Search by athlete name or bib number.
+- Select multiple athletes to pin them on every plot with color-coded markers showing their time, percentile, and rank (e.g. "Top 2% (9/418)").
+- Athlete summary strip with per-segment stats for all selected athletes.
+- Sortable results table; click any row to pin/unpin that athlete.
+
+## Scraper
+
+To regenerate `results.json` from the live results page:
 
 1. Create a virtual environment and install dependencies:
 
@@ -18,9 +34,9 @@ pip install requests
 python scrape_results.py
 ```
 
-This fetches all 421 results (paginated at 100 per page) and writes them to `results.json`.
+This fetches all 421 results (paginated at 100 per page) and writes them to `results.json`. The race data is already embedded in `index.html`, so re-running the scraper requires regenerating `index.html` as well (see comments at the top of `scrape_results.py`).
 
-## Output
+## Data fields
 
 Each entry in `results.json` contains:
 
