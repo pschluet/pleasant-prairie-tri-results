@@ -1179,6 +1179,18 @@ function hexToRgba(hex, alpha) {
 }
 
 // ─── TOGGLE / SELECT ──────────────────────────────────────────────────────────
+function syncUrl() {
+  const params = new URLSearchParams(window.location.search);
+  if (state.selectedAthletes.length) {
+    params.set('athletes', state.selectedAthletes.map(a => a.bib).join(','));
+  } else {
+    params.delete('athletes');
+  }
+  const qs = params.toString();
+  const newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
+  try { history.replaceState(null, '', newUrl); } catch (e) { /* file:// may block; ignore */ }
+}
+
 function toggleAthlete(ath) {
   const idx = state.selectedAthletes.findIndex(a => a.bib === ath.bib);
   if (idx >= 0) {
@@ -1190,8 +1202,8 @@ function toggleAthlete(ath) {
   }
   document.getElementById('search-input').value = '';
   document.getElementById('search-dropdown').classList.remove('open');
+  syncUrl();
   render();
-
 }
 
 // ─── SEARCH ───────────────────────────────────────────────────────────────────
@@ -1294,6 +1306,7 @@ document.getElementById('strip-clear-all').addEventListener('click', () => {
   state.selectedAthletes = [];
   athleteColorIndex.clear();
   colorCounter = 0;
+  syncUrl();
   render();
 });
 
@@ -1314,6 +1327,17 @@ window.addEventListener('resize', () => {
 });
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
+(function initFromUrl() {
+  const raw = new URLSearchParams(window.location.search).get('athletes');
+  if (!raw) return;
+  raw.split(',').map(s => s.trim()).filter(Boolean).forEach(bib => {
+    const ath = athletes.find(a => a.bib === bib);
+    if (ath && !state.selectedAthletes.some(a => a.bib === bib)) {
+      athleteColorIndex.set(bib, colorCounter++);
+      state.selectedAthletes.push(ath);
+    }
+  });
+})();
 render();
 </script>
 </body>
