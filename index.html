@@ -1180,15 +1180,8 @@ function hexToRgba(hex, alpha) {
 
 // ─── TOGGLE / SELECT ──────────────────────────────────────────────────────────
 function syncUrl() {
-  const params = new URLSearchParams(window.location.search);
-  if (state.selectedAthletes.length) {
-    params.set('athletes', state.selectedAthletes.map(a => a.bib).join(','));
-  } else {
-    params.delete('athletes');
-  }
-  const qs = params.toString();
-  const newUrl = window.location.pathname + (qs ? '?' + qs : '') + window.location.hash;
-  try { history.replaceState(null, '', newUrl); } catch (e) { /* file:// may block; ignore */ }
+  const bibs = state.selectedAthletes.map(a => a.bib).join(',');
+  history.replaceState(null, '', bibs ? '#athletes=' + bibs : location.pathname + location.search);
 }
 
 function toggleAthlete(ath) {
@@ -1328,8 +1321,9 @@ window.addEventListener('resize', () => {
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 (function initFromUrl() {
-  const raw = new URLSearchParams(window.location.search).get('athletes');
-  if (!raw) return;
+  const hash = window.location.hash; // e.g. '#athletes=539,131'
+  if (!hash.startsWith('#athletes=')) return;
+  const raw = hash.slice('#athletes='.length);
   raw.split(',').map(s => s.trim()).filter(Boolean).forEach(bib => {
     const ath = athletes.find(a => a.bib === bib);
     if (ath && !state.selectedAthletes.some(a => a.bib === bib)) {
